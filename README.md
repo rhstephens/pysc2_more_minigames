@@ -8,7 +8,7 @@ A **Minigame** is a controlled subset of StarCraft II's environment that allows 
 
 An agent learns by taking observations from the environment (in the shape of feature layers) alongside its `Curriculum Score` (i.e. a reward that illustrates how well an agent doing right now). To create a successful Minigame, you have to design a challenge that *rewards* an agent when it's doing something right, and optionally *punishing* an agent when it's doing something wrong.
 
-The most basic Minigame provided by the SC2LE is `MoveToBeacon` An agent must learn how to use the basic move command by navigating towards the glowing beacons.
+The most basic Minigame provided by the SC2LE is `MoveToBeacon`. In this Minigame, an agent must learn how to use the basic move command by navigating towards the glowing beacons.
 
 ```
 GIF HERE showing MoveToBeacon
@@ -22,21 +22,36 @@ As simple as it sounds, it takes the agent ~3000 attempts (episodes) to play thi
 
 The first Minigame I had made was a simple modification of `MoveToBeacon`.
 
-```
-GIF HERE showing MoveTwoBeacons
-```
-Instead of having a single beacon spawn each time a marine enters one, we will have two beacons that the marine must navigate to before the next two spawn. The idea is to teach an agent not only how to navigate to a location, but how to choose an optimal route to get there. The rest of this tutorial will guide you through the creation of **MoveTwoBeacons** and training an agent to play it correctly.
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/two_beacons_example.gif "MoveTwoBeacons")
+
+Instead of having a single beacon spawn each time a marine enters one, we will have two beacons that the marine must navigate to before the next two spawn. The idea is to teach an agent not only how to navigate to a location, but how to choose an optimal route to get there.
+
+After training the agent from scratch for ~5000 episodes, you can tell that the agents performs well, but still makes some mistakes on finding the shortest route.`
+
+### Episode Score
+
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/two_beacons_episode_score.png "MoveTwoBeacons episode_score")
+
+## Score Comparisons
+
+Mean scores were taken over 100 episodes for the Agent to see how it compares against a real Human player (me) over 10 episodes.
+
+| Minigame | Mean Episode Score (Trained Agent) |  Mean Episode Score (Human) |
+| --- | --- | --- | --- |
+| MoveToBeacon | **26** | 26 |
+| MoveTwoBeacons | **26** | 26 |
+
+
 
 # Training an agent against a custom Minigame
 
-Here, I will guide you through making a custom Minigame that an agent can learn to play. Before we start working in the StarCraft II Galaxy Editor and design our new Minigame, we need to set a few things up.
+Here, I will guide you through making a custom Minigame that an agent can learn to play. We will go through the creation of **MoveTwoBeacons** and then training an agent to play it correctly. Before we start working in the StarCraft II Galaxy Editor and design our new Minigame, we need to set a few things up.
 
 ## Setting up your environment
 
 To get started, you will need:
 - StarCraft II (at least v3.16.1)
-- [pysc2](https://github.com/deepmind/pysc2) (**v1.2**)
-- [StarCraft II Minigames](https://github.com/deepmind/pysc2#get-the-maps)
+- [pysc2](https://github.com/deepmind/pysc2) (**v1.2**) with the [StarCraft II Minigames](https://github.com/deepmind/pysc2#get-the-maps)
 - Python 3 (tested on 3.6.6)
 - Tensorflow / Tensorflow-gpu (tested on 1.11.0)
 
