@@ -24,9 +24,9 @@ The first Minigame I had made was a simple modification of `MoveToBeacon`.
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/two_beacons_example.gif "MoveTwoBeacons")
 
-Instead of having a single beacon spawn each time a marine enters one, we will have two beacons that the marine must navigate to before the next two spawn. The idea is to teach an agent not only how to navigate to a location, but how to choose an optimal route to get there.
+Instead of having a single beacon spawn each time a marine enters one, there will be two beacons that the marine must navigate to before the next two spawn. The idea is to teach an agent not only how to navigate to a location, but how to choose an optimal route to get there.
 
-After training the agent from scratch for ~5000 episodes, you can tell that the agents performs well, but still makes some mistakes on finding the shortest route.`
+After training the agent from scratch for ~5000 episodes, you can tell that the agents performs well, but still makes some mistakes on finding the shortest route.
 
 ### Episode Score
 
@@ -37,7 +37,7 @@ After training the agent from scratch for ~5000 episodes, you can tell that the 
 Mean scores were taken over 100 episodes for the Agent to see how it compares against a real Human player (me) over 10 episodes.
 
 | Minigame | Mean Episode Score (Trained Agent) |  Mean Episode Score (Human) |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | MoveToBeacon | **26** | 26 |
 | MoveTwoBeacons | **26** | 26 |
 
