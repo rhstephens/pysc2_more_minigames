@@ -10,9 +10,7 @@ An agent learns by taking observations from the environment (in the shape of fea
 
 The most basic Minigame provided by the SC2LE is `MoveToBeacon`. In this Minigame, an agent must learn how to use the basic move command by navigating towards the glowing beacons.
 
-```
-GIF HERE showing MoveToBeacon
-```
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/move_to_beacon_example.gif "MoveToBeacon")
 
 As simple as it sounds, it takes the agent ~3000 attempts (episodes) to play this Minigame at the quality you are seeing above. That is why it is *crucial* to have a well designed `Curriculum Scoring` system in your Minigame, especially as the tasks and environment get more complicated.
 
@@ -20,7 +18,7 @@ As simple as it sounds, it takes the agent ~3000 attempts (episodes) to play thi
 
 ## MoveTwoBeacons
 
-The first Minigame I had made was a simple modification of `MoveToBeacon`.
+The first Minigame I made was a simple modification of `MoveToBeacon`.
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/two_beacons_example.gif "MoveTwoBeacons")
 
@@ -38,10 +36,8 @@ Mean scores were taken over 100 episodes for the Agent to see how it compares ag
 
 | Minigame | Mean Episode Score (Trained Agent) |  Mean Episode Score (Human) |
 | --- | --- | --- |
-| MoveToBeacon | **26** | 26 |
-| MoveTwoBeacons | **26** | 26 |
-
-
+| MoveToBeacon | **26.76** | 26.4 |
+| MoveTwoBeacons | **26.74** | 29.7 |
 
 # Training an agent against a custom Minigame
 
