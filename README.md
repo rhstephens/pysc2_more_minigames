@@ -10,34 +10,9 @@ An agent learns by taking observations from the environment (in the shape of fea
 
 The most basic Minigame provided by the SC2LE is `MoveToBeacon`. In this Minigame, an agent must learn how to use the basic move command by navigating towards the glowing beacons.
 
-![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/move_to_beacon_example.gif "MoveToBeacon")
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveToBeacon/one_beacon_example.gif "MoveToBeacon")
 
 As simple as it sounds, it takes the agent ~3000 attempts (episodes) to play this Minigame at the quality you are seeing above. That is why it is *crucial* to have a well designed `Curriculum Scoring` system in your Minigame, especially as the tasks and environment get more complicated.
-
-# Minigame Results
-
-## MoveTwoBeacons
-
-The first Minigame I made was a simple modification of `MoveToBeacon`.
-
-![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/two_beacons_example.gif "MoveTwoBeacons")
-
-Instead of having a single beacon spawn each time a marine enters one, there will be two beacons that the marine must navigate to before the next two spawn. The idea is to teach an agent not only how to navigate to a location, but how to choose an optimal route to get there.
-
-After training the agent from scratch for ~5000 episodes, you can tell that the agents performs well, but still makes some mistakes on finding the shortest route.
-
-### Episode Score
-
-![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/two_beacons_episode_score.png "MoveTwoBeacons episode_score")
-
-## Score Comparisons
-
-Mean scores were taken over 100 episodes for the Agent to see how it compares against a real Human player (me) over 10 episodes.
-
-| Minigame | Mean Episode Score (Trained Agent) |  Mean Episode Score (Human) |
-| --- | --- | --- |
-| MoveToBeacon | **26.76** | 26.4 |
-| MoveTwoBeacons | **26.74** | 29.7 |
 
 # Training an agent against a custom Minigame
 
@@ -57,10 +32,53 @@ I have decided to use simonmeister's [pysc2-rl-agents](https://github.com/simonm
 
 The Galaxy Editor should come already installed when you downloaded the game so go ahead and open it up from the Battle.net launcher. We are going to use `MoveToBeacon.SC2Map` as a base, so copy the file and rename it to `MoveTwoBeacons.SC2Map`. These Minigames should be located in `<install_path>/StarCraft II/Maps/minigames/` after following the directions above. Open up the new SC2Map in the Editor and you should be welcomed with this:
 
-![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/editor.png "Editor")
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/editor.png "Editor")
 
+What you are seeing is the `Terrain Module`, which allows you to place Units, Regions, Doodads, Cameras etc. as well as modifying the Terrain itself. For our purposes, we only need to worry about `Regions`.
+
+1. Click this to bring up the `Region` view.
+2. Here we can add new regions or modify existing ones. Since we need two beacons for this Minigame, simply copy the existing `Beacon Area`.
+
+I've noticed that the region size of `Beacon Area` is actually smaller than the visual size of the beacon when placed, which has an effect on the agent's outcome. I recommend changing the `Beacon Area` size from 2.50 -> 3.0
+
+---
+
+That's all we need from the Terrain Module. Next, we want to work on this Minigame's `Triggers`. Triggers allow us to modify the game state whenever a certain event happens. This event can be almost anything that occurs in StarCraft II - from an amount of time elapsing to a certain Unit using an ability. There is plenty of user-made documentation on triggers and if you get lost going forward, check out [Sc2Mapster Tutorials](https://sc2mapster.gamepedia.com/Tutorials).
+
+To start working with triggers, open up the `Trigger Module` shown at #3 above. You will see this:
+
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_old.png "Trigger Module")
+
+---
+
+# Minigame Results
+
+## MoveTwoBeacons
+
+The first Minigame I made was a simple modification of `MoveToBeacon`.
+
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/two_beacons_example.gif "MoveTwoBeacons")
+
+Instead of having a single beacon spawn each time a marine enters one, there will be two beacons that the marine must navigate to before the next two spawn. The idea is to teach an agent not only how to navigate to a location, but how to choose an optimal route to get there.
+
+After training the agent from scratch for ~5000 episodes, you can tell that the agents performs well, but still makes some mistakes on finding the shortest route.
+
+### Episode Score
+
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/two_beacons_episode_score.png "MoveTwoBeacons episode_score")
+
+## Score Comparisons
+
+Mean scores were taken over 100 episodes for the Agent to see how it compares against a real Human player (me) over 10 episodes.
+
+| Minigame | Mean Episode Score (Trained Agent) |  Mean Episode Score (Human) |
+| --- | --- | --- |
+| MoveToBeacon | **26.76** | 26.4 |
+| MoveTwoBeacons | **26.74** | 29.7 |
 
 # Curriculum Training
+
+Cite Cirriculum Training paper here.
 
 Using an already trained agent to learn more advanced tasks. Using a 1 beacon agent to learn two beacons.
 
