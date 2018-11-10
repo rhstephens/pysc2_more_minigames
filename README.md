@@ -28,11 +28,15 @@ To get started, you will need:
 
 I have decided to use simonmeister's [pysc2-rl-agents](https://github.com/simonmeister/pysc2-rl-agents) to train my agents. You will need to clone that repo into your working directory for later use.
 
-## The StarCraft II Galaxy Editor
+## Creating a Minigame
+
+### The StarCraft II Galaxy Editor
 
 The Galaxy Editor should come already installed when you downloaded the game so go ahead and open it up from the Battle.net launcher. We are going to use `MoveToBeacon.SC2Map` as a base, so copy the file and rename it to `MoveTwoBeacons.SC2Map`. These Minigames should be located in `<install_path>/StarCraft II/Maps/minigames/` after following the directions above. Open up the new SC2Map in the Editor and you should be welcomed with this:
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/editor.png "Editor")
+
+### Terrain Module
 
 What you are seeing is the `Terrain Module`, which allows you to place Units, Regions, Doodads, Cameras etc. as well as modifying the Terrain itself. For our purposes, we only need to worry about `Regions`.
 
@@ -41,7 +45,7 @@ What you are seeing is the `Terrain Module`, which allows you to place Units, Re
 
 I've noticed that the region size of `Beacon Area` is actually smaller than the visual size of the beacon when placed, which has an effect on the agent's outcome. I recommend changing the `Beacon Area` size from 2.50 -> 3.0
 
----
+### Trigger Module
 
 That's all we need from the Terrain Module. Next, we want to work on this Minigame's `Triggers`. Triggers allow us to modify the game state whenever a certain event happens. This event can be almost anything that occurs in StarCraft II - from an amount of time elapsing to a certain Unit using an ability. There is plenty of user-made documentation on triggers and if you get lost going forward, check out [SC2Mapster Tutorials](https://sc2mapster.gamepedia.com/Tutorials).
 
@@ -51,17 +55,19 @@ To start working with triggers, open up the `Trigger Module` shown at #3 above. 
 
 The left-side panel displays a list of defined triggers and variables used to manipulate the game state. Most of the work is done for us, but we will have to make a few tweaks.
 
-First off, we need to define a few variables (right click the panel and select New->New Variable):
-- Copy `Beacon` so that we have a reference to our second beacon unit.
-- Create **Boolean** variables named "Beacon 1 Reached" and "Beacon 2 Reached" respectively. We will need these to determine when it's safe to reset our beacon locations.
+Before diving right in, I should let you know that you can test your minigame at any time by pressing the green StarCraft II icon (Ctrl + F9) from the Terrain Module screen. It's useful to frequently test your minigame as you add more and more functionality to it.
 
-There are a few places where we want to reset the location of our beacons, so it makes sense to create a custom Action. Instead of copying the logic out multiple times, we can group it under a single Action and call that Action where we need it.
+To start, we need to define a few variables (right click the panel and select New->New Variable):
+- Copy `Beacon` so that we have a reference to our second beacon unit.
+- Create two **Boolean** variables named "Beacon 1 Reached" and "Beacon 2 Reached" respectively. We will need these to determine when it's time to reset our beacon locations.
+
+There are a few times when we want to reset the location of our beacons, so it makes sense to create a *custom Action*. A custom Action allows us to define our own sequence of Actions with optional parameters and a return type. Once defined, we can call that Action whenever we need it.
 
 To define a new Action, right click the left-side panel and select New->New Action Definition. Here's what we want it to do:
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_reset_beacons_action.png "Reset Beacons Action")
 
-1. Destroy the current references to `Beacon` and `Beacon 2`. Then, create new beacons at a random point in `Beacon Spawn Region` that our variables point to.
+1. Destroy the current references to `Beacon` and `Beacon 2`. Then, create new beacons at a random point in `Beacon Spawn Region`. Make sure our variables reference the newly created units.
 2. In a while loop, move the beacon to a new random point in the region until our conditions are satisfied. We want to ensure that
     -  The new beacon isn't trivially close to our Marine.
     -  The distance between the two beacons is non-trivial.
@@ -73,13 +79,41 @@ We have ourselves a handy custom Action, but haven't used it yet. Next, let's mo
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_init.png "Init Trigger")
 
-1. All we need to do here is remove the old set of actions that initialized the beacon and replace it with our newly created `Reset Beacons` custom Action.
+1. All we need to do here is remove the old set of actions that initialized the beacon and replace it with our newly created `Reset Beacons` custom Action. The rest of the trigger can be left alone as we need it to set up things like the Camera, Curriculum Score, and other triggers.
 
+Now we need to modify our `Curriculum Scoring` trigger. What we want is a trigger that checks if our Marine has entered one of the two beacons. If so, we add 1 to our score and disable that beacon (temporarily).
 
+Copy the existing `Score Updates and Victory` trigger as a base to create the following two triggers:
+
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_beacon_score1.png "Score 1")
+
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_beacon_score2.png "Score 2")
    
+Be sure to include the `Beacon Reached` conditions and to update the variable after entering the region. Otherwise, you could be double counting scores.
 
+Now, we need a trigger to reset the beacons once both have been reached by the Player:
 
----
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_check_for_reset.png "Check For Reset")
+
+This one is easy. All we need is a Timer event that fires every so often, checking if both `Beacon 1 Reached` and `Beacon 2 Reached` are true. If so, we call our custom `Reset Beacons` Action made earlier.
+
+When we eventually train an Agent to play our minigame, there has to be a quick way for the Agent to reset the minigame without performing a full restart. The Agent does this by typing "reset" into the game chat, expecting the game to handle the rest. When designing our minigame, we have to implement this reset functionality in a Trigger. 
+
+There already exists a trigger named `Reset Map` that we have to modify for our purposes. You can leave everything as is except for the following:
+
+![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_reset_map.png "Reset Map")
+
+1. This temporarily disables scoring while resetting the map state.
+2. Reset the beacons to a valid position.
+3. Reactivate scoring Triggers.
+
+*And that's it!*
+
+I'd recommend poking around the other Triggers/Variables so you have a full understanding of the minigame.
+
+## Training the Agent
+
+Now that we have a minigame, it's time to train an Agent to play it.
 
 # Minigame Results
 
