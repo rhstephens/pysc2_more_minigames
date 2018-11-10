@@ -47,7 +47,13 @@ I've noticed that the region size of `Beacon Area` is actually smaller than the 
 
 ### Trigger Module
 
-That's all we need from the Terrain Module. Next, we want to work on this Minigame's `Triggers`. Triggers allow us to modify the game state whenever a certain event happens. This event can be almost anything that occurs in StarCraft II - from an amount of time elapsing to a certain Unit using an ability. There is plenty of user-made documentation on triggers and if you get lost going forward, check out [SC2Mapster Tutorials](https://sc2mapster.gamepedia.com/Tutorials).
+That's all we need from the Terrain Module. Next, we want to work on this Minigame's `Triggers`. Triggers allow us to modify the game state whenever a certain event happens. This event can be almost anything that occurs in StarCraft II - from an amount of time elapsing to a certain Unit using an ability. The general flow of a Trigger is as follows:
+
+ 1. **Events:** Some event in the game has happened, activating an instance of this trigger.
+ 2. **Conditions:** Before performing any actions, ensure that *all* of the listed conditions are satisfied. If any condition returns false, no actions are performed.
+ 3. **Actions:** A list of actions carried out in sequential order.
+
+There are plenty of user-made tutorials on triggers and if you get lost going forward, check out [SC2Mapster Tutorials](https://sc2mapster.gamepedia.com/Tutorials).
 
 To start working with triggers, open up the `Trigger Module` shown at #3 above. You will see this:
 
