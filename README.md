@@ -6,7 +6,7 @@ This repository serves as a tutorial for making your own custom minigames as def
 
 A **Minigame** is a controlled subset of StarCraft II's environment that allows agents to learn certain features of the game. Instead of having access to the entire map and action space, we can define Minigames for agents to learn one particular task (for example, training an SCV to harvest minerals and vespene gas). These Minigames are created like any other map in StarCraft, through the [StarCraft II Galaxy Editor](http://starcraft-2-galaxy-editor-tutorials.thehelper.net/tutorials.php).
 
-An agent learns by taking observations from the environment (in the shape of feature layers) alongside its `Curriculum Score` (i.e. a reward that illustrates how well an agent doing right now). To create a successful Minigame, you have to design a challenge that *rewards* an agent when it's doing something right, and optionally *punishing* an agent when it's doing something wrong.
+An agent learns by taking observations from the environment (in the shape of feature layers taken from the screen) alongside its `Curriculum Score` (i.e. a reward that illustrates how well an agent doing right now). To create a successful Minigame, you have to design a challenge that *rewards* an agent when it's doing something right, and optionally *punishing* an agent when it's doing something wrong.
 
 The most basic Minigame provided by the SC2LE is `MoveToBeacon`. In this Minigame, an agent must learn how to use the basic move command by navigating towards the glowing beacons.
 
@@ -45,6 +45,8 @@ What you are seeing is the `Terrain Module`, which allows you to place Units, Re
 
 I've noticed that the region size of `Beacon Area` is actually smaller than the visual size of the beacon when placed, which has an effect on the agent's outcome. I recommend changing the `Beacon Area` size from 2.50 -> 3.0
 
+---
+
 ### Trigger Module
 
 That's all we need from the Terrain Module. Next, we want to work on this Minigame's `Triggers`. Triggers allow us to modify the game state whenever a certain event happens. This event can be almost anything that occurs in StarCraft II - from an amount of time elapsing to a certain Unit using an ability. The general flow of a Trigger is as follows:
@@ -55,7 +57,7 @@ That's all we need from the Terrain Module. Next, we want to work on this Miniga
 
 There are plenty of user-made tutorials on triggers and if you get lost going forward, check out [SC2Mapster Tutorials](https://sc2mapster.gamepedia.com/Tutorials).
 
-To start working with triggers, open up the `Trigger Module` shown at #3 above. You will see this:
+To start working with triggers, open up the `Trigger Module` shown at #3 in the picture above. You will see this:
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_old.png "Trigger Module")
 
@@ -113,13 +115,91 @@ There already exists a trigger named `Reset Map` that we have to modify for our 
 2. Reset the beacons to a valid position.
 3. Reactivate scoring Triggers.
 
-*And that's it!*
+*And that's it!* If you run this SC2 Map (Ctrl + F9), you should be able to play it as intended. If you're stuck with some bugs, reference my map at `mini_games/MoveTwoBeacons.SC2Map`
 
-I'd recommend poking around the other Triggers/Variables so you have a full understanding of the minigame.
+I'd also recommend poking around the other Triggers/Variables so you have a full understanding of the minigame.
+
+---
 
 ## Training the Agent
 
-Now that we have a minigame, it's time to train an Agent to play it.
+Now that we have a minigame, it's time to train an Agent to play it. As mentioned before, we will be using simonmeister's [pysc2-rl-agents](https://github.com/simonmeister/pysc2-rl-agents). However if you want to save replays from the game while training, you can clone my fork and use that as a working directory (while my pull request is sitting in review :D).
+
+```
+git clone git@github.com:Codetroopa/pysc2-rl-agents.git
+cd pysc2-rl-agents
+```
+
+---
+
+### Adding our new map to the PySC2 environment
+
+We've made a map, yes, but pysc2 doesn't know about it yet. Thankfully, it is easy to configure this our own by implementing a child class of `Map`. Create a file in your working directory (something like `<yourname>_maps.py`) with the following:
+
+```python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+from pysc2.maps import lib
+
+######
+# Simply rename this class however you want
+######
+class RyansMaps(lib.Map):
+  directory = "mini_games"
+  download = "https://github.com/codetroopa/pysc2_more_minigames"
+  players = 1
+  score_index = 0
+  game_steps_per_episode = 0
+  step_mul = 8
+
+######
+# Add your map name here. PySC2 will attempt to find the map name from the directory "<SC2InstallPath>/Maps/"
+######
+maps = [
+  "MoveTwoBeacons"
+]
+
+for name in maps:
+  globals()[name] = type(name, (RyansMaps,), dict(filename=name))
+
+```
+
+`run.py` is used to train our agent, so we will have to modify that file to include our new map:
+
+```python
+# just add this import amongst the others in this file
+import <yourname>_maps
+```
+
+---
+
+### Using the Runner
+
+Now that we have everything set up, training the agent is actually quite simple. We just need to name our experiment and pass that alongside our map name to `run.py`. The experiment name will be used to create a directory that saves our Tensorflow model checkpoints and summaries. So if you want to restart training on a model at any point, you can simply pass in the previous experiment name. This is also useful for later evaluating your model's mean episode score.
+
+There are also quite a few optional arguments you can pass into `run.py`, however most are best left to their defaults. I'd recommend running the following when first getting started:
+
+```
+python run.py <your_experiment_name> --map MoveTwoBeacons --envs 1 --vis
+```
+
+This will run a single environment with our custom map, `MoveTwoBeacons`. The `--vis` argument will render the game with pygame (a graphics library) for feature visualization alongside the actual SC2 game. If you want to save a replay, simply supply `--replay_dir <your_replay_dir>` and `--save_replay_episodes <num_episodes_before_recording_replay>`
+
+For a full list of parameters, simply look at the source code in `run.py` or enter:
+
+```
+python run.py --help
+```
+
+---
+
+*And that's all she wrote!*
+
+![](https://thumbs.gfycat.com/MildAdorableIbis-size_restricted.gif)
+
+If you made it this far and found the tutorial helpful, please Star this project and any others linked!
 
 # Minigame Results
 
@@ -153,6 +233,3 @@ Cite Cirriculum Training paper here.
 Using an already trained agent to learn more advanced tasks. Using a 1 beacon agent to learn two beacons.
 
 Watch what happens when we test our `MoveToBeacon` agent against our new `MoveTwoBeacons` map:
-
-
-
