@@ -83,11 +83,15 @@ To define a new Action, right click the left-side panel and select New->New Acti
 3. Same as above, but for `Beacon 2` and `Beacon Area 2`.
 4. Reset our variables used to track when beacons have been reached.
 
+---
+
 We have ourselves a handy custom Action, but haven't used it yet. Next, let's modify our Init trigger. This trigger is called once at the beginning of the game and sets up some required properties.
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_init.png "Init Trigger")
 
 1. All we need to do here is remove the old set of actions that initialized the beacon and replace it with our newly created `Reset Beacons` custom Action. The rest of the trigger can be left alone as we need it to set up things like the Camera, Curriculum Score, and other triggers.
+
+---
 
 Now we need to modify our `Curriculum Scoring` trigger. What we want is a trigger that checks if our Marine has entered one of the two beacons. If so, we add 1 to our score and disable that beacon (temporarily).
 
@@ -99,11 +103,15 @@ Copy the existing `Score Updates and Victory` trigger as a base to create the fo
    
 Be sure to include the `Beacon Reached` conditions and to update the variable after entering the region. Otherwise, you could be double counting scores.
 
+---
+
 Now, we need a trigger to reset the beacons once both have been reached by the Player:
 
 ![](https://github.com/codetroopa/pysc2_more_minigames/raw/master/screenshots/MoveTwoBeacons/triggers_check_for_reset.png "Check For Reset")
 
-This one is easy. All we need is a Timer event that fires every so often, checking if both `Beacon 1 Reached` and `Beacon 2 Reached` are true. If so, we call our custom `Reset Beacons` Action made earlier.
+This one is easy. All we need is a Timer event that fires every so often, checking if both `Beacon 1 Reached` and `Beacon 2 Reached` are true. If so, we call our custom `Reset Beacons` Action made earlier. ***Note:*** the "every so often" is actually 16 times a second, the tick rate that SC2 simulates the game at.
+
+---
 
 When we eventually train an Agent to play our minigame, there has to be a quick way for the Agent to reset the minigame without performing a full restart. The Agent does this by typing "reset" into the game chat, expecting the game to handle the rest. When designing our minigame, we have to implement this reset functionality in a Trigger. 
 
@@ -118,8 +126,6 @@ There already exists a trigger named `Reset Map` that we have to modify for our 
 *And that's it!* If you run this SC2 Map (Ctrl + F9), you should be able to play it as intended. If you're stuck with some bugs, reference my map at `mini_games/MoveTwoBeacons.SC2Map`
 
 I'd also recommend poking around the other Triggers/Variables so you have a full understanding of the minigame.
-
----
 
 ## Training the Agent
 
@@ -155,7 +161,8 @@ class RyansMaps(lib.Map):
   step_mul = 8
 
 ######
-# Add your map name here. PySC2 will attempt to find the map name from the directory "<SC2InstallPath>/Maps/"
+# Add your map name here. PySC2 will attempt to find the map name from the
+# directory provided above (starting from the root SC2 Maps directory "<SC2InstallPath>/Maps/")
 ######
 maps = [
   "MoveTwoBeacons"
@@ -185,7 +192,7 @@ There are also quite a few optional arguments you can pass into `run.py`, howeve
 python run.py <your_experiment_name> --map MoveTwoBeacons --envs 1 --vis
 ```
 
-This will run a single environment with our custom map, `MoveTwoBeacons`. The `--vis` argument will render the game with pygame (a graphics library) for feature visualization alongside the actual SC2 game. If you want to save a replay, simply supply `--replay_dir <your_replay_dir>` and `--save_replay_episodes <num_episodes_before_recording_replay>`
+This will run a single environment with our custom map `MoveTwoBeacons`. The `--vis` argument will render the game with pygame (a graphics library) for feature visualization alongside the actual SC2 game. If you want to save a replay, simply supply `--replay_dir <your_replay_dir>` and `--save_replay_episodes <num_episodes_before_recording_replay>`
 
 For a full list of parameters, simply look at the source code in `run.py` or enter:
 
@@ -197,9 +204,9 @@ python run.py --help
 
 *And that's all she wrote!*
 
-![](https://thumbs.gfycat.com/MildAdorableIbis-size_restricted.gif)
-
 If you made it this far and found the tutorial helpful, please Star this project and any others linked!
+
+![](https://thumbs.gfycat.com/MildAdorableIbis-size_restricted.gif)
 
 # Minigame Results
 
